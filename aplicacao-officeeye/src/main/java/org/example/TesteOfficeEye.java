@@ -194,7 +194,7 @@ public class TesteOfficeEye {
                     continuarTentando = false; // Sair do loop se o login for bem-sucedido
                 } else {
                     // Registrar falha de login
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
                     String dataHoraAtual = LocalDateTime.now().format(formatter);
 
                     if (logFileAtual == null || logFileAtual.length() >= MAX_LOG_SIZE) {
@@ -203,7 +203,7 @@ public class TesteOfficeEye {
 
                     try (FileWriter fw = new FileWriter(logFileAtual, true)) {
                         String mensagemErro = String.format(
-                                "Erro ao logar! Esse login não existe. Verifique o e-mail e senha novamente ou entre em contato com o suporte técnico da sua empresa. Data: %s, Email de acesso: %s%n",
+                                "Erro ao logar! Esse login não existe. Data: %s, Email de acesso: %s%n",
                                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
                                 email
                         );
