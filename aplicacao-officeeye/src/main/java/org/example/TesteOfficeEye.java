@@ -22,12 +22,12 @@ import static oshi.util.FormatUtil.formatBytes;
 public class TesteOfficeEye {
     private static final Logger log = LoggerFactory.getLogger(TesteOfficeEye.class);
 
-    private static final String LOG_DIR = "logs/";
-    private static final String LOG_FILE_PREFIX = "Log-OfficeEye-";
+    private static final String LOG_DIR = "logs-erros-de-login/";
+    private static final String LOG_FILE_PREFIX = "Log-OfficeEye_";
     private static final long MAX_LOG_SIZE = 20 * 1024; // 20KB
     private static File logFileAtual;
-
     public static void main(String[] args) {
+        // validando formato do email
         Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
 
         try {
@@ -52,8 +52,7 @@ public class TesteOfficeEye {
                                     Bem-Vindo ao monitoramento officeEye!
                         ----------------------------------------------------------------
                                                     LOGIN
-                        Email:
-                        """);
+                        Email:""");
 
                 String email = leitorLogin.nextLine();
 
@@ -193,8 +192,8 @@ public class TesteOfficeEye {
 
                     continuarTentando = false; // Sair do loop se o login for bem-sucedido
                 } else {
-                    // Registrar falha de login
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
+                    // Registrando falha de login
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
                     String dataHoraAtual = LocalDateTime.now().format(formatter);
 
                     if (logFileAtual == null || logFileAtual.length() >= MAX_LOG_SIZE) {
@@ -203,7 +202,7 @@ public class TesteOfficeEye {
 
                     try (FileWriter fw = new FileWriter(logFileAtual, true)) {
                         String mensagemErro = String.format(
-                                "Erro ao logar! Esse login não existe. Data: %s, Email de acesso: %s%n",
+                                "Erro ao logar! Esse login não existe. Data: %s. Email de acesso: %s%n",
                                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
                                 email
                         );
@@ -225,13 +224,12 @@ public class TesteOfficeEye {
                     System.out.println("""
                             Deseja tentar outro login?
                             1- Sim
-                            Qualquer outro dígito - Não/Sair
+                            Qualquer outro caractere - Não/Sair
                             """);
 
-                    int resposta = leitorLogin.nextInt();
-                    leitorLogin.nextLine(); // Consumir nova linha
+                    String resposta = leitorLogin.nextLine();
 
-                    if (resposta != 1) {
+                    if (!resposta.equals("1")) {
                         continuarTentando = false;
                         System.exit(0);
                     }
