@@ -33,7 +33,7 @@ public class Log {
         // nome do arquivo que será gerado
         String file = "%s-OfficeEye-log.log".formatted(dateFormatted);
 
-        // verifica se o diretório já existe. Se não existir ainda, é criado
+        // verifica se o diretório já existe
         if (!Files.exists(path)) {
             Files.createDirectory(path);
         }
@@ -42,7 +42,7 @@ public class Log {
         File log = new File("%s/%s".formatted(path, file));
 
         // se não existir nenhum arquivo com o mesmo nome, um novo arquivo é criado
-        // como estou gravando apenas data, pois será um arquivo de log por dia, apenas 1 arquivo é gerado por dia
+        // gravando apenas data, pois será um arquivo de log por dia
         if (!log.exists()) {
             log.createNewFile();
         }
@@ -63,10 +63,7 @@ public class Log {
 
         bw.close();
         fw.close();
-
     }
-
-
 
     public static void generateLog(String message, String typeLog) throws IOException {
 
@@ -81,14 +78,14 @@ public class Log {
         LocalDate date = LocalDate.now();
         LocalDateTime dateTimeNow = LocalDateTime.now();
 
-        // formatação da data e hora atual com o modelo
+        // formatação da data e hora atual
         String dateFormatted = df.format(date);
         String dateTimeFormatted = dtf.format(dateTimeNow);
 
         // nome do arquivo que será gerado
         String file = "OfficeEye-log-%s.log".formatted(dateFormatted);
 
-        // verifica se o diretório já existe. Se não existir ainda, é criado
+        // verifica se o diretório já existe
         if (!Files.exists(path)) {
             Files.createDirectory(path);
         }

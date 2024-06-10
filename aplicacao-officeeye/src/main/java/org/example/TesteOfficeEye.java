@@ -1,20 +1,11 @@
 package org.example;
 
 import com.github.britooo.looca.api.core.Looca;
-import com.github.britooo.looca.api.group.discos.DiscoGrupo;
-import com.github.britooo.looca.api.group.memoria.Memoria;
-import com.github.britooo.looca.api.group.processador.Processador;
-import com.github.britooo.looca.api.group.processos.ProcessoGrupo;
-import com.github.britooo.looca.api.group.servicos.ServicoGrupo;
-import com.github.britooo.looca.api.group.sistema.Sistema;
-import com.github.britooo.looca.api.group.temperatura.Temperatura;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.*;
 import java.util.List;
 
 public class TesteOfficeEye {
-
     public static void main(String[] args) {
 
         //scanner para login
@@ -28,12 +19,9 @@ public class TesteOfficeEye {
         BdMySql mysql = new BdMySql();
         BdSqlServer sqlserver = new BdSqlServer();
 
-        //instância da conexão com o banco local
-        Conexao conexao = new Conexao();
-        JdbcTemplate con = conexao.getConexaoDoBanco();
-
         //instância do looca para coletar dados
         Looca looca = new Looca();
+
 
         //escolha do tipo de login
         System.out.println(String.format("""
@@ -73,7 +61,7 @@ public class TesteOfficeEye {
                 if (maquinaFuncionario.isEmpty()) {
                     AreaLoginFuncionarioGeral.mostrarMensagemErroMaquina();
                 } else {
-                    AreaLoginFuncionarioGeral.exibirAreaLogadaFuncionarioGeral(conexao, con, mysql, sqlserver, funcionarioLogado, maquinaFuncionario, looca, verificacaoLogin, email);
+                    AreaLoginFuncionarioGeral.exibirAreaLogadaFuncionarioGeral(mysql, sqlserver, funcionarioLogado, maquinaFuncionario, looca, verificacaoLogin);
                 }
             } else {
                 AreaLoginFuncionarioGeral.mostrarMensagemErroCredenciais();

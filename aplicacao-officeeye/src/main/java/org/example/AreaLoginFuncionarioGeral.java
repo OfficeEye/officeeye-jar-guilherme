@@ -5,11 +5,9 @@ import com.github.britooo.looca.api.core.Looca;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.json.JSONObject;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 public class AreaLoginFuncionarioGeral {
 
@@ -36,7 +34,7 @@ public class AreaLoginFuncionarioGeral {
         System.exit(0);
     }
 
-    public static void exibirAreaLogadaFuncionarioGeral(Conexao conexao, JdbcTemplate con, BdMySql mysql, BdSqlServer sqlserver, FuncionarioGeral funcionarioLogado, List<Maquina> maquinaFuncionario, Looca looca, boolean verificacaoLogin, String email) {
+    public static void exibirAreaLogadaFuncionarioGeral(BdMySql mysql, BdSqlServer sqlserver, FuncionarioGeral funcionarioLogado, List<Maquina> maquinaFuncionario, Looca looca, boolean verificacaoLogin) {
 
         System.out.println(String.format( """
                 \n
@@ -46,43 +44,6 @@ public class AreaLoginFuncionarioGeral {
                 * Aperte a tecla ENTER para parar o monitoramento e deslogar.
                 """.formatted(funcionarioLogado.getNome())));
 
-        String sql = "SELECT tempoColetaMilissegundos FROM funcionario WHERE email = ?";
-        Integer tempoColetaMilissegundos = con.queryForObject(sql, new Object[]{email}, Integer.class);
-
-        long period = tempoColetaMilissegundos; // 10 segundos
-        long delay = tempoColetaMilissegundos; // 10 segundos
-        if (tempoColetaMilissegundos == null) {
-            // Perguntar ao usuário de quanto em quanto tempo deseja fazer o monitoramento
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("""
-            ----------------------------------------------------------------
-            Escolha o intervalo de tempo para o monitoramento:
-            1. de 5 em 5 segundos
-            2. de 10 em 10 segundos
-            3. de 15 em 15 segundos
-            4. de 20 em 20 segundos
-            5. de 25 em 25 segundos
-            6. de 30 em 30 segundos(default)
-            """);
-            int escolha = scanner.nextInt();
-
-            switch (escolha) {
-                case 1 -> period = 5000;
-                case 2 -> period = 10000;
-                case 3 -> period = 15000;
-                case 4 -> period = 20000;
-                case 5 -> period = 25000;
-                case 6 -> period = 30000;
-                default -> {
-                    System.out.println("Opção inválida! Usando o intervalo padrão de 30 segundos.");
-                    period = 30000;
-                }
-            }
-
-            String updateTime = "UPDATE funcionario SET tempoColetaMilissegundos = " + period + " WHERE email = '" + email + "';";
-            con.update(updateTime);
-        }
-
         sqlserver.atualizarStatusLogin(funcionarioLogado);
 
         Integer idMaquina = maquinaFuncionario.get(0).getIdMaquina();
@@ -91,7 +52,6 @@ public class AreaLoginFuncionarioGeral {
         String nomeMaquina = maquinaFuncionario.get(0).getNomeMaquina();
         String sistemaOperacional = looca.getSistema().getSistemaOperacional();
         Integer fkEmpresa = maquinaFuncionario.get(0).getFkEmpresa();
-        String hostname = looca.getRede().getParametros().getHostName();
 
         Maquina maquina = new Maquina(idMaquina, modelo, fabricante, nomeMaquina, sistemaOperacional, funcionarioLogado, fkEmpresa);
 
@@ -133,6 +93,7 @@ public class AreaLoginFuncionarioGeral {
                     Integer fkMaquina = maquina.getIdMaquina();
                     Integer fkFuncionario = funcionarioLogado.getIdFuncionario();
                     Integer fkEmpresa = maquina.getFkEmpresa();
+                    String hostname = looca.getRede().getParametros().getHostName();
 
                     //disco
                     Double espacoDisponivel = looca.getGrupoDeDiscos().getVolumes().get(0).getDisponivel().doubleValue() / conversorGb;
@@ -145,10 +106,10 @@ public class AreaLoginFuncionarioGeral {
 
                     if (porcentagemEspacoLivre <= metricas.get(0).getPorcentagemCritico()) {
                         statusRegistroEspacoLivre = "Crítico";
-                        enviarMensagemSlack("Alerta crítico 🚨 : " + hostname + " com espaço em disco abaixo de " + metricas.get(0).getPorcentagemCritico() + "%.");
+                        enviarMensagemSlack("Alerta crítico 🚨: " + hostname + " com espaço em disco abaixo de " + metricas.get(0).getPorcentagemCritico() + "%.");
                     } else if (porcentagemEspacoLivre <= metricas.get(0).getPorcentagemAlerta()) {
                         statusRegistroEspacoLivre = "Alerta";
-                        enviarMensagemSlack("Alerta ❗ : " + hostname + " com espaço em disco abaixo de " + metricas.get(0).getPorcentagemAlerta() + "%.");
+                        enviarMensagemSlack("Alerta: " + hostname + " com espaço em disco abaixo de " + metricas.get(0).getPorcentagemAlerta() + "%.");
                     } else {
                         statusRegistroEspacoLivre = "Ideal";
                     }
@@ -164,10 +125,10 @@ public class AreaLoginFuncionarioGeral {
 
                     if (porcentagemUsoMemoria >= metricas.get(1).getPorcentagemCritico()) {
                         statusRegistroMemoriaUso = "Crítico";
-                        enviarMensagemSlack("Alerta crítico 🚨 : " + hostname + " com uso de memória acima de " + metricas.get(1).getPorcentagemCritico() + "%.");
+                        enviarMensagemSlack("Alerta crítico 🚨: " + hostname + " com uso de memória acima de " + metricas.get(1).getPorcentagemCritico() + "%.");
                     } else if (porcentagemUsoMemoria >= metricas.get(1).getPorcentagemAlerta()) {
                         statusRegistroMemoriaUso = "Alerta";
-                        enviarMensagemSlack("Alerta ❗ : " + hostname + " com uso de memória acima de " + metricas.get(1).getPorcentagemAlerta() + "%.");
+                        enviarMensagemSlack("Alerta: " + hostname + " com uso de memória acima de " + metricas.get(1).getPorcentagemAlerta() + "%.");
                     } else {
                         statusRegistroMemoriaUso = "Ideal";
                     }
@@ -187,20 +148,20 @@ public class AreaLoginFuncionarioGeral {
 
                     if (usoProcessador >= metricas.get(2).getPorcentagemCritico()) {
                         statusRegistroUsoProcessador = "Crítico";
-                        enviarMensagemSlack("Alerta crítico 🚨 : " + hostname + " com uso de processador acima de " + metricas.get(2).getPorcentagemCritico() + "%.");
+                        enviarMensagemSlack("Alerta crítico 🚨: " + hostname + " com uso de processador acima de " + metricas.get(2).getPorcentagemCritico() + "%.");
                     } else if (usoProcessador >= metricas.get(2).getPorcentagemAlerta()) {
                         statusRegistroUsoProcessador = "Alerta";
-                        enviarMensagemSlack("Alerta ❗ : " + hostname + " com uso de processador acima de " + metricas.get(2).getPorcentagemAlerta() + "%.");
+                        enviarMensagemSlack("Alerta: " + hostname + " com uso de processador acima de " + metricas.get(2).getPorcentagemAlerta() + "%.");
                     } else {
                         statusRegistroUsoProcessador = "Ideal";
                     }
 
                     if (temperaturaCpu >= metricas.get(3).getPorcentagemCritico()) {
                         statusRegistroTemperaturaCpu = "Crítico";
-                        enviarMensagemSlack("Alerta crítico 🚨 : " + hostname + " com temperatura da CPU acima de " + metricas.get(3).getPorcentagemCritico() + "°C.");
+                        enviarMensagemSlack("Alerta crítico 🚨: " + hostname + " com temperatura da CPU acima de " + metricas.get(3).getPorcentagemCritico() + "°C.");
                     } else if (temperaturaCpu >= metricas.get(3).getPorcentagemAlerta()) {
                         statusRegistroTemperaturaCpu = "Alerta";
-                        enviarMensagemSlack("Alerta ❗ : " + hostname + " com temperatura da CPU acima de " + metricas.get(3).getPorcentagemAlerta() + "°C.");
+                        enviarMensagemSlack("Alerta: " + hostname + " com temperatura da CPU acima de " + metricas.get(3).getPorcentagemAlerta() + "°C.");
                     } else {
                         statusRegistroTemperaturaCpu = "Ideal";
                     }
@@ -239,6 +200,8 @@ public class AreaLoginFuncionarioGeral {
             }
         };
 
+        long delay = 5000; // 5 segundos
+        long period = 5000; // 5 segundos
 
         timer.scheduleAtFixedRate(task, delay, period);
     }
