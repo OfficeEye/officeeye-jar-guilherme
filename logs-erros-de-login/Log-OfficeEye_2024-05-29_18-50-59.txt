@@ -1,2 +1,0 @@
-Erro ao logar! Esse login não existe. Data: 29-05-2024 18:50:59. Email de acesso: teste@teste1.com
-Erro ao logar! Esse login não existe. Data: 29-05-2024 18:51:09. Email de acesso: teste@teste2.com

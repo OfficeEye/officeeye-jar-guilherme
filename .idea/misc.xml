@@ -5,7 +5,6 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/aplicacao-officeeye/pom.xml" />
-        <option value="$PROJECT_DIR$/aplicacao-officeeye-aws/pom.xml" />
       </list>
     </option>
   </component>
